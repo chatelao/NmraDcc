@@ -39,6 +39,7 @@
 //            2019-02-17 added ESP32 specific changes by Hans Tanner
 //            2020-05-15 changes to pass NMRA Tests ( always search for preamble )
 //            2021-03-11 fix ESP32 bug on interrupt reinitialisation
+//            2025-02-25 added last bit timestamp to DccRx for RailCom
 //------------------------------------------------------------------------
 //
 // purpose:   Provide a simplified interface to decode NMRA DCC packets
@@ -685,6 +686,7 @@ void IRAM_ATTR ExternalInterruptHandler(void)
                 #ifdef ESP32
                 portENTER_CRITICAL_ISR (&mux);
                 #endif
+                DccRx.PacketBuf.EndTimeMicros = actMicros;
                 DccRx.PacketCopy = DccRx.PacketBuf ;
                 DccRx.DataReady += 1 ;
                 #ifdef ESP32

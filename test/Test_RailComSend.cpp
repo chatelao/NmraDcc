@@ -119,6 +119,19 @@ TEST(AddressBroadcasetTest, LongAddressCh1) {
   EXPECT_EQ(railcom::sendLongAddress( 0xc3, 0xEC, 3 ), 0x96D8 );
 }
 
+TEST(SleepAndSend, SleepAndSendCh1) {
+  EXPECT_EQ(railcom::getSleepNeeded( 123456, 55, 123456 ), 55 );
+  EXPECT_EQ(railcom::getSleepNeeded( 123456, 55, 123458 ), 53 );
+  EXPECT_EQ(railcom::getSleepNeeded( 123456, 55, 123511 ),  0 );
+  EXPECT_EQ(railcom::getSleepNeeded( 123456, 55, 123512 ),  0 );
+}
+
+TEST(SleepAndSend, SleepAndSendCh2) {
+  EXPECT_EQ(railcom::getSleepNeeded( 123456, 115, 123458 ), 113 );
+  EXPECT_EQ(railcom::getSleepNeeded( 123456, 115, 123571 ),   0 );
+  EXPECT_EQ(railcom::getSleepNeeded( 123456, 115, 123573 ),   0 );
+}
+
 #if defined(ARDUINO)
 #include <Arduino.h>
 

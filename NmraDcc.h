@@ -68,6 +68,7 @@ typedef struct
     uint8_t Size ;
     uint8_t PreambleBits ;
     uint8_t Data[MAX_DCC_MESSAGE_LEN] ;
+    unsigned long EndTimeMicros;
 } DCC_MSG ;
 
 //--------------------------------------------------------------------------

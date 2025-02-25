@@ -35,7 +35,14 @@
 #ifndef _DCC_RAILCOM_HPP_
 #define _DCC_RAILCOM_HPP_
 
+#ifdef ARDUINO
+#include <Arduino.h>
+#endif
 #include <cstdint>
+
+
+#define RAILCOM_DELAY_CH1  80
+#define RAILCOM_DELAY_CH2 115
 
 namespace railcom
 {
@@ -183,25 +190,26 @@ namespace railcom
 
     //
     // See: https://docs.tcsdcc.com/wiki/CV_28
-    // =======================================
-    //
-    // - Bit 0: Channel 1 is active
-    // - Bit 1: Channel 2 is active
-    // - Bit 2: Channel 2 Auto-Off
-    // - Bit 3: Channel 1 with ID3 (Informations)
-    // - Bit 4: Programming adress '0003'
-    // - Bit 5: Reserved, not used
-    // - Bit 6: High-current (60mA) RailCom
-    // - Bit 7: Allow automatic login according to DCC-A (RCN-218)
-    //
+    typedef enum
+    {
+        CV28_CHANNEL1_ACTIVE    = 1 << 0,  // - Bit 0: Channel 1 is active
+        CV28_CHANNEL2_ACTIVE    = 1 << 1,  // - Bit 1: Channel 2 is active
+        CV28_CHANNEL2_AUTO_OFF  = 1 << 2,  // - Bit 2: Channel 2 Auto-Off
+        CV28_CHANNEL1_WITH_ID3  = 1 << 3,  // - Bit 3: Channel 1 with ID3 (Informations)
+        CV28_PROG_ADDR_0003     = 1 << 4,  // - Bit 4: Programming adress '0003'
+        CV28_RESERVED_DONT_USE  = 1 << 5,  // - Bit 5: Reserved, not used
+        CV28_RAILCOM_HIGH_CURR  = 1 << 6,  // - Bit 6: High-current (60mA) RailCom
+        CV28_DCC_AUT_LOGON      = 1 << 7,  // - Bit 7: Allow automatic login according to DCC-A (RCN-218)
+    } CV_28_BITS;
+
     bool CV28_is_ch1_active(uint8_t cv28_railcom)
     {
-        return (cv28_railcom & 0x1) != 0;
+        return (cv28_railcom & CV28_CHANNEL1_ACTIVE) != 0;
     }
 
     bool CV28_is_ch2_active(uint8_t cv28_railcom)
     {
-        return (cv28_railcom & 0x2) != 0;
+        return (cv28_railcom & CV28_CHANNEL2_ACTIVE) != 0;
     }
 
     bool CV28_is_ch1_auto_off(uint8_t cv28_railcom)
@@ -213,6 +221,13 @@ namespace railcom
     {
         return (cv28_railcom & 0x8) != 0;
     }
+
+    unsigned long getSleepNeeded(unsigned long endBitTime, unsigned long offset, unsigned long now) {
+        
+        long sleepRest = offset - (now - endBitTime);
+        return (sleepRest > 0 ? sleepRest : 0);
+    }
+
 }  // namespace railcom
 
 #endif // _DCC_RAILCOM_HPP_

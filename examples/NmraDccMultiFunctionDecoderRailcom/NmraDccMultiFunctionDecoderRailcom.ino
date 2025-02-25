@@ -41,11 +41,18 @@ void notifyCVResetFactoryDefault()
 };
 
 int cycle = 0;
+unsigned long endBitTime = 0;
+void notifyDccMsg(DCC_MSG *Msg)
+{
+  endBitTime = Msg->EndTimeMicros;
+}
+
 void notifyDccSpeed( uint16_t Addr, DCC_ADDR_TYPE AddrType, uint8_t Speed, DCC_DIRECTION Dir, DCC_SPEED_STEPS SpeedSteps )
 {
   //
   // Send the railcom message
   //
+  railcom::getSleepNeeded(endBitTime, RAILCOM_DELAY_CH1, micros());
   if(AddrType == DCC_ADDR_SHORT) {
     Serial1.print(railcom::sendShortAddress(Addr, cycle++));
   } else {
@@ -87,7 +94,7 @@ void setup()
   while(!Serial && maxWaitLoops--)
     delay(20);
 
-  Serial.println("NMRA Dcc Multifunction Decoder Demo 1");
+  Serial.println("NMRA Dcc Railcom Decoder Demo");
 
   // Configure the DCC CV Programing ACK pin for an output
   pinMode( DccAckPin, OUTPUT );
