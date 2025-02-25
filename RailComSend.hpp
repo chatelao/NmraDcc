@@ -42,7 +42,7 @@
 
 
 #define RAILCOM_DELAY_CH1  80
-#define RAILCOM_DELAY_CH2 115
+#define RAILCOM_DELAY_CH2 193
 
 namespace railcom
 {
