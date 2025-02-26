@@ -283,13 +283,13 @@ static word  bitMax, bitMin;
 
 typedef enum
 {
-    WAIT_PREAMBLE = 0,
-    WAIT_START_BIT,
+    WAIT_PREAMBLE  = 0,
+    WAIT_START_BIT = 1,
     #ifndef SYNC_ALWAYS
-    WAIT_START_BIT_FULL,
+    WAIT_START_BIT_FULL = 2,
     #endif
-    WAIT_DATA,
-    WAIT_END_BIT
+    WAIT_DATA      = 3,
+    WAIT_END_BIT   = 4
 }
 DccRxWaitState ;
 

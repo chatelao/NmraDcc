@@ -48,7 +48,7 @@
 // Uncomment the following line to Enable 14 Speed Step Support
 //#define NMRA_DCC_ENABLE_14_SPEED_STEP_MODE
 
-#if defined(ARDUINO) && ARDUINO >= 100
+#if (defined(ARDUINO) && ARDUINO >= 100) || defined(ArduinoFake)
     #include "Arduino.h"
 #else
     #include "WProgram.h"
@@ -129,12 +129,16 @@ typedef struct
     #define PRIO_SYSTIC     8               // MUST be higher priority than DCC Irq
 #elif defined(ARDUINO_ARCH_RP2040)
     #define MAXCV    256	     			    // todo: maybe somebody knows a good define for it
-#elif defined ( ARDUINO_ARCH_RENESAS_UNO)
+#elif defined( ARDUINO_ARCH_RENESAS_UNO)
     #define MAXCV	EEPROM.length()
 #elif defined(ARDUINO_SAMD_ZERO) 
     #define MAXCV    EEPROM_EMULATION_SIZE
 #else
-    #define MAXCV    E2END     					// the upper limit of the CV value currently defined to max memory.
+#if defined(ArduinoFake)
+#define MAXCV    256     					// the upper limit of the CV value currently defined to max memory.
+#else
+#define MAXCV    E2END     					// the upper limit of the CV value currently defined to max memory.
+#endif
 #endif
 
 typedef enum
