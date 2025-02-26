@@ -1762,7 +1762,7 @@ uint8_t NmraDcc::process()
         // We need to do this check with interrupts disabled
         #ifdef ESP32
         portENTER_CRITICAL (&mux);
-        #else
+        #elif !defined(ArduinoFake)
         noInterrupts();
         #endif
         Msg = DccRx.PacketCopy ;
@@ -1771,7 +1771,7 @@ uint8_t NmraDcc::process()
 
         #ifdef ESP32
         portEXIT_CRITICAL (&mux);
-        #else
+        #elif !defined(ArduinoFake)
         interrupts();
         #endif
         // Checking of the XOR-byte is now done in the ISR already

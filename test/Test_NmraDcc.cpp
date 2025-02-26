@@ -30,7 +30,7 @@ unsigned long addDccZero(unsigned long time) {
   return addDcc( time, 100 );
 }
 
-TEST(TimeTestTest, MinTest) {
+TEST(InterruptTests, BitAndStateTest) {
 
   When(Method(ArduinoFake(EEPROM), read)).AlwaysReturn(0xFF);
   When(Method(ArduinoFake(EEPROM), write)).AlwaysReturn();
@@ -46,7 +46,7 @@ TEST(TimeTestTest, MinTest) {
   unsigned long time = 0;
 
   //
-  // 17 Bits preamble
+  // >= 17 Bits preamble
   //
   EXPECT_EQ(DccRx.State, WAIT_PREAMBLE);
   for(int i = 0; i < 19; i++) {
@@ -96,7 +96,48 @@ TEST(TimeTestTest, MinTest) {
   
   EXPECT_EQ(DccRx.State, WAIT_PREAMBLE);
 
+  EXPECT_EQ(DccRx.PacketBuf.Data[0], 0x55 ); // 1st Byte
+  EXPECT_EQ(DccRx.PacketBuf.Data[1], 0xAA ); // 2nd Byte
+  EXPECT_EQ(DccRx.PacketBuf.Data[2], 0xFF ); // XOR Checksum
+
+  EXPECT_EQ(DccRx.PacketBuf.Size,          3 );
+  EXPECT_EQ(DccRx.PacketBuf.PreambleBits, 17 );
+
+  //
+  // Check timestamp for Railcom (6ms)
+  //
+  EXPECT_EQ(DccRx.PacketBuf.EndTimeMicros, 6376);
+
   Verify(Method(ArduinoFake(), micros)).Exactly(94);
   Verify(Method(ArduinoFake(), digitalRead)).Exactly(50);
 
+}
+
+TEST(ProcessTests, ProcessBuffer) {
+
+  When(Method(ArduinoFake(EEPROM), read)).AlwaysReturn(0xFF);
+  When(Method(ArduinoFake(EEPROM), write)).AlwaysReturn();
+
+  NmraDcc  Dcc ;
+/*
+  DccRx.State = WAIT_PREAMBLE;
+  DccRx.BitCount = 0;
+  DccRx.PacketBuf.StartTimeMicros = 0;
+  DccRx.PacketBuf.EndTimeMicros = 0;
+  DccRx.PacketBuf.Data = 0;
+  DccRx.PacketBuf.Xor = 0;    
+*/
+
+  DccProcState.inServiceMode = 0;
+
+  DccRx.PacketBuf.Data[0]      = 0x01;
+  DccRx.PacketBuf.Data[1]      = 0x10;
+  DccRx.PacketBuf.Data[2]      = 0x02;
+  DccRx.PacketBuf.Size         =    3;
+  DccRx.PacketBuf.PreambleBits =   18;
+
+  DccRx.DataReady              =    1;
+
+  Dcc.process();
+    
 }
